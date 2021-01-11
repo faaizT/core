@@ -1,17 +1,14 @@
 ###############################################################################
 #Sorce and Header Defines
 ###############################################################################
-message(STATUS "")
-message(STATUS "Configuring ${PROJECT_NAME}")
 
 #Biogears circuit_test
-add_source_files(CIRCUIT_TEST_PUBLIC_HDRS ${BIOGEARS_SOURCE_DIR}/libCircuitTest/include "*.h"  "Headers\\Public\\")
-add_source_files(CIRCUIT_TEST_SRCS ${BIOGEARS_SOURCE_DIR}/libCircuitTest/src "*cpp" "Sources\\")
+add_source_files(CIRCUIT_TEST_PUBLIC_HDRS LOCATION ${BIOGEARS_SOURCE_DIR}/libCircuitTest/include REGEX "*.h" SOURCE_GROUP "Headers\\Public\\")
+add_source_files(CIRCUIT_TEST_SRCS LOCATION ${BIOGEARS_SOURCE_DIR}/libCircuitTest/src REGEX  "*cpp" SOURCE_GROUP "Sources\\")
 
 set(LIB${PREFIX}_CIRCUIT_TEST_HEADERS ${CIRCUIT_TEST_HDRS} ${PUBLIC_CIRCUIT_TEST_HDRS} ${GEN_CIRCUIT_TEST_HDRS})
 set(LIB${PREFIX}_CIRCUIT_TEST_SOURCES ${CIRCUIT_TEST_SRCS} ${GEN_CIRCUIT_TEST_SRCS})
 
-message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 ###############################################################################
 # libBiogears_circuit_test
 ###############################################################################
@@ -50,7 +47,6 @@ if( ${ROOT_PROJECT_NAME}_BUILD_CIRCUIT_TESTS)
             Eigen3::Eigen
             Biogears::lib${PROJECT_NAME}
   )
-  message(STATUS "${PREFIX}_circuit_test_LIBS=${${PREFIX}_circuit_test_LIBS}")
   target_link_libraries(lib${PROJECT_NAME}_circuit_test  PUBLIC ${${PREFIX}_CIRCUIT_TEST_LIBS} )
 
   install(TARGETS lib${PROJECT_NAME}_circuit_test EXPORT libBiogears
@@ -63,5 +59,3 @@ if( ${ROOT_PROJECT_NAME}_BUILD_CIRCUIT_TESTS)
     install(FILES $<TARGET_PDB_FILE:lib${PROJECT_NAME}_circuit_test> DESTINATION lib/${${ROOT_PROJECT_NAME}_PLATFORM_PREFIX}$<$<BOOL:${${ROOT_PROJECT_NAME}_BREAKOUT_INSTALL}>:/$<CONFIG>> OPTIONAL)
   endif()
 endif()
-  
-message(STATUS "")

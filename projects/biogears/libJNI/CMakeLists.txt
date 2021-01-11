@@ -1,8 +1,6 @@
 ###############################################################################
 #Sorce and Header Defines
 ###############################################################################
-message(STATUS "")
-message(STATUS "Configuring ${PROJECT_NAME}")
 
 #Biogears JNI
 add_source_files(JNI_PUBLIC_HDRS ${BIOGEARS_SOURCE_DIR}/libJNI/include "*.h"  "Headers\\Public\\")
@@ -10,8 +8,6 @@ add_source_files(JNI_SRCS ${BIOGEARS_SOURCE_DIR}/libJNI/src "*cpp" "Sources\\")
 
 set(LIB${PREFIX}_JNI_HEADERS ${JNI_PUBLIC_HDRS})
 set(LIB${PREFIX}_JNI_SOURCES ${JNI_SRCS})
-
-message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 
 ###############################################################################
 # libBiogears_jni
@@ -53,7 +49,6 @@ if(Java_FOUND AND ${ROOT_PROJECT_NAME}_BUILD_JAVATOOLS AND ${ROOT_PROJECT_NAME}_
       Biogears::lib${PROJECT_NAME}_circuit_test
   )
   
-  message(STATUS "${PREFIX}_jni_LIBS=${${PREFIX}_jni_LIBS}")
   target_link_libraries(lib${PROJECT_NAME}_jni  PUBLIC ${${PREFIX}_jni_LIBS} )
   
   install(TARGETS lib${PROJECT_NAME}_jni EXPORT libBiogears
@@ -69,5 +64,3 @@ endif()
 ######################################################################################################
 # INSTALL LOGIC
 ######################################################################################################
-
-message(STATUS "")

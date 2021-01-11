@@ -1,20 +1,17 @@
 ###############################################################################
 #Sorce and Header Defines
 ###############################################################################
-message(STATUS "")
-message(STATUS "Configuring ${PROJECT_NAME}")
 
 #Biogears CDM
-add_source_files(CDM_PUBLIC_HDRS ${BIOGEARS_SOURCE_DIR}/libCDM "*.h"  "Headers\\Public\\")
-add_source_files(CDM_GEN_HDRS ${BIOGEARS_BINARY_DIR}/biogears "*.hxx"  "Headers\\Public\\")
-add_source_files(CDM_GEN_SRCS ${BIOGEARS_BINARY_DIR}/biogears "*.cxx" "Sources\\")
+add_source_files(CDM_PUBLIC_HDRS LOCATION ${BIOGEARS_SOURCE_DIR}/libCDM REGEX "*.h" SOURCE_GROUP "Headers\\Public\\")
+add_source_files(CDM_GEN_HDRS LOCATION ${BIOGEARS_BINARY_DIR}/generated/biogears REGEX "*.hxx" SOURCE_GROUP  "Headers\\Public\\")
+add_source_files(CDM_GEN_SRCS LOCATION ${BIOGEARS_BINARY_DIR}/generated/biogears REGEX "*.cxx" SOURCE_GROUP "Sources\\")
 
 set(LIB${PREFIX}_CDM_HEADERS ${CDM_PUBLIC_HDRS} ${CDM_GEN_HDRS})
 set(LIB${PREFIX}_CDM_SOURCES ${CDM_PUBLIC_SRCS} ${CDM_GEN_SRCS})
 
-message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 ###############################################################################
-#Define Logic
+#Code Generation
 ###############################################################################
 
   ###############################################################################
@@ -54,8 +51,7 @@ message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
             CodeSynthesis::XSD
             Eigen3::Eigen
   )
-	message(STATUS "${PREFIX}_cdm_LIBS=${${PREFIX}_cdm_LIBS}")
-    target_link_libraries(lib${PROJECT_NAME}_cdm  PUBLIC ${${PREFIX}_cdm_LIBS} )
+	target_link_libraries(lib${PROJECT_NAME}_cdm  PUBLIC ${${PREFIX}_cdm_LIBS} )
 
   install(TARGETS lib${PROJECT_NAME}_cdm  EXPORT libBiogears
       RUNTIME DESTINATION bin/${${ROOT_PROJECT_NAME}_PLATFORM_PREFIX}$<$<BOOL:${${ROOT_PROJECT_NAME}_BREAKOUT_INSTALL}>:/$<CONFIG>>
@@ -66,4 +62,3 @@ message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 	install(FILES $<TARGET_PDB_FILE:lib${PROJECT_NAME}_cdm> DESTINATION lib/${${ROOT_PROJECT_NAME}_PLATFORM_PREFIX}$<$<BOOL:${${ROOT_PROJECT_NAME}_BREAKOUT_INSTALL}>:/$<CONFIG>> OPTIONAL)
   endif()
 
-message(STATUS "")
