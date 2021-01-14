@@ -126,11 +126,15 @@ else()
   set(${PREFIX}_LIBS
             Eigen3::Eigen
             Log4cpp::Log4cpp
-		       	Biogears::lib${PROJECT_NAME}_common
+            Biogears::lib${PROJECT_NAME}_common
             Biogears::lib${PROJECT_NAME}_cdm
   )
   
   target_link_libraries(lib${PROJECT_NAME}  PUBLIC ${${PREFIX}_LIBS} )
+  if(TARGET Biogears::lib${PROJECT_NAME}_io)
+    target_link_libraries(lib${PROJECT_NAME}  PUBLIC Biogears::lib${PROJECT_NAME}_io )
+    target_compile_definitions(lib${PROJECT_NAME} PUBLIC BIOGEARS_IO_PRESENT )
+  endif()
   if(WIN32)
 		install(FILES $<TARGET_PDB_FILE:lib${PROJECT_NAME}> DESTINATION lib/${${ROOT_PROJECT_NAME}_PLATFORM_PREFIX}$<$<BOOL:${${ROOT_PROJECT_NAME}_BREAKOUT_INSTALL}>:/$<CONFIG>> OPTIONAL)
   endif()
