@@ -159,6 +159,11 @@ void DynamicSepsis::SetAntibiotic()
 void DynamicSepsis::SetIVFluids(int compound, double rate)
 {
   if (compound == 1) {
+    if (m_saline == NULL) {
+      GetLogger()->Info("M_SALINE is null");
+    } else {
+      GetLogger()->Info("M_SALINE is not null");
+    }    
     m_saline->GetBagVolume().SetValue(500.0, VolumeUnit::mL);
     m_saline->GetRate().SetValue(rate, VolumePerTimeUnit::mL_Per_min);
     m_mutex.lock();

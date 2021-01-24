@@ -5,5 +5,5 @@
 
 int main( int argc, char* argv[] )
 {
-  HowToRunScenario();
+  HowToRunScenario(argv[1]);
 }

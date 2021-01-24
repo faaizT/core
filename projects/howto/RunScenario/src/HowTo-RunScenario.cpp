@@ -49,14 +49,14 @@ public:
 ///
 /// \details
 //--------------------------------------------------------------------------------------------------
-void HowToRunScenario()
+void HowToRunScenario(const std::string& prefix)
 {
   // Create an engine object
   // BioGearsEngines will always output log messages to stdout and a log file
   // If you want this engine to write a log file, include the name
   // of the log file. If nullptr is given, the engine will only output to the console
-  std::unique_ptr<PhysiologyEngine> bg = CreateBioGearsEngine("HowToRunScenario.log");
-  bg->GetLogger()->Info("HowToRunScenario");
+  std::unique_ptr<PhysiologyEngine> bg = CreateBioGearsEngine(prefix + ".log");
+  bg->GetLogger()->Info(prefix);
 
   // This BioGearsEngine logger is based on log4cpp (which is based on log4j)
   // BioGearsEngine logs to several distinct, ordered
@@ -71,30 +71,30 @@ void HowToRunScenario()
 
   // Create a Scenario Executor
   SEScenarioExec executor(*bg);
-  // Let's make a scenario (you could just point the executor to a scenario xml file on disk as well)
-  SEScenario sce(bg->GetSubstanceManager());
-  sce.SetName("HowToRunScenario");
-  sce.SetDescription("Simple Scenario to demonstraight building a scenario by the CDM API");
-  sce.GetInitialParameters().SetPatientFile("StandardMale.xml");
-  // Note you can set an Engine state, or create your own SEPatient object (see HowTo-CreateAPatient)
-  // When filling out a data request, units are optional
-  // The units will be set to whatever units the engine uses.
-  // NOTE: The scenario makes it's own copy of these requests
-  // Once you set it, any changes will not be reflected in the scenario
-  // You can reuse this object for future actions
-  sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("HeartRate", FrequencyUnit::Per_min);
-  sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("RespirationRate", FrequencyUnit::Per_min);
-  sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("TotalLungVolume", VolumeUnit::mL);
-  // you can specify where the file goes
-  sce.GetDataRequestManager().SetResultsFilename("./HowTo-RunScenarioResults.csv");
-  // If you don't set the file name it will try to make a place for the results in a bin/Scenarios/ folder
-  // Let's just run for 2 minutes
-  // NOTE: the scenario will make it's own copy of this action
-  // Once you set it, any changes will not be reflected in the scenario
-  // You can reuse this object for future actions
-  SEAdvanceTime adv;
-  adv.GetTime().SetValue(2, TimeUnit::min);
-  sce.AddAction(adv);
+  // // Let's make a scenario (you could just point the executor to a scenario xml file on disk as well)
+  // SEScenario sce(bg->GetSubstanceManager());
+  // sce.SetName("HowToRunScenario");
+  // sce.SetDescription("Simple Scenario to demonstraight building a scenario by the CDM API");
+  // sce.GetInitialParameters().SetPatientFile("StandardFemale.xml");
+  // // Note you can set an Engine state, or create your own SEPatient object (see HowTo-CreateAPatient)
+  // // When filling out a data request, units are optional
+  // // The units will be set to whatever units the engine uses.
+  // // NOTE: The scenario makes it's own copy of these requests
+  // // Once you set it, any changes will not be reflected in the scenario
+  // // You can reuse this object for future actions
+  // sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("HeartRate", FrequencyUnit::Per_min);
+  // sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("RespirationRate", FrequencyUnit::Per_min);
+  // sce.GetDataRequestManager().CreatePhysiologyDataRequest().Set("TotalLungVolume", VolumeUnit::mL);
+  // // you can specify where the file goes
+  // sce.GetDataRequestManager().SetResultsFilename("./HowTo-RunScenarioResults.csv");
+  // // If you don't set the file name it will try to make a place for the results in a bin/Scenarios/ folder
+  // // Let's just run for 2 minutes
+  // // NOTE: the scenario will make it's own copy of this action
+  // // Once you set it, any changes will not be reflected in the scenario
+  // // You can reuse this object for future actions
+  // SEAdvanceTime adv;
+  // adv.GetTime().SetValue(2, TimeUnit::min);
+  // sce.AddAction(adv);
 
-  executor.Execute(sce, "./HowTo-RunScenarioResults.csv", new MyCustomExec());
+  executor.Execute("./Scenarios/Patient/" + prefix + ".xml", "./" + prefix + ".csv", new MyCustomExec());
 }
