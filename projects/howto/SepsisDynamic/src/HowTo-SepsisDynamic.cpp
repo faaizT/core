@@ -103,7 +103,7 @@ DynamicSepsis::DynamicSepsis(const std::string& logfile, int infectionInput)
   //Create the engine
   m_bg = CreateBioGearsEngine(logfile);
   //Load appropriate patient state
-  std::string patientState = "./states/InfectionStates/SevereInfection";
+  std::string patientState = "./states/InfectionStates/ModerateInfection";
   if (infectionInput == 1) {
     patientState += "@36hr.xml";
     m_StartTime_min = 2160.0;
