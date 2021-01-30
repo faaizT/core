@@ -92,6 +92,25 @@ function(add_howto name)
      ARCHIVE DESTINATION lib/${${ROOT_PROJECT_NAME}_PLATFORM_PREFIX}$<$<BOOL:${${ROOT_PROJECT_NAME}_BREAKOUT_INSTALL}>:/$<CONFIG>>
   )
 
+  if(${name} STREQUAL "SimulationScripts")
+    FIND_PACKAGE(SWIG REQUIRED)
+    INCLUDE(${SWIG_USE_FILE})
+
+    FIND_PACKAGE(PythonLibs)
+    INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/SimulationScripts/src")
+    INCLUDE_DIRECTORIES("/Users/faaiz/Biogears/core/projects/biogears/libBiogears/src")
+    message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}/SimulationScripts/src")
+    SET(CMAKE_SWIG_FLAGS "")
+    add_library(rewardImpl SHARED "${CMAKE_CURRENT_SOURCE_DIR}/SimulationScripts/src/RewardFromAntibiotics.h" "${CMAKE_CURRENT_SOURCE_DIR}/SimulationScripts/src/RewardFromAntibiotics.cpp")
+
+    SET_SOURCE_FILES_PROPERTIES(/Users/faaiz/Biogears/core/projects/howto/SimulationScripts/src/reward.i PROPERTIES CPLUSPLUS ON)
+    SET_SOURCE_FILES_PROPERTIES(/Users/faaiz/Biogears/core/projects/howto/SimulationScripts/src/reward.i PROPERTIES SWIG_FLAGS "-includeall")
+    SWIG_ADD_MODULE(reward python /Users/faaiz/Biogears/core/projects/howto/SimulationScripts/src/reward.i)
+    SWIG_LINK_LIBRARIES(reward ${PYTHON_LIBRARIES})
+  
+  endif()
+
   endif(BUILD_EX_${EXAMPLE_NAME})
 endfunction(add_howto)
 
