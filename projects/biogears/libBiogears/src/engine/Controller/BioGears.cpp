@@ -271,11 +271,19 @@ bool BioGears::SetupPatient()
   }
   age_yr = m_Patient->GetAge().GetValue(TimeUnit::yr);
   if (age_yr < ageMin_yr) {
-    m_Logger->Error(std::stringstream() << "Patient age of " << age_yr << " years is too young. We do not model pediatrics. Minimum age allowed is " << ageMin_yr << " years.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetAge().SetValue(ageMin_yr, TimeUnit::yr);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient age of " << age_yr << " years is too young. We do not model pediatrics. Minimum age allowed is " << ageMin_yr << " years.");
+      err = true;
+    }
   } else if (age_yr > ageMax_yr) {
-    m_Logger->Error(std::stringstream() << "Patient age of " << age_yr << " years is too old. We do not model geriatrics. Maximum age allowed is " << ageMax_yr << " years.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetAge().SetValue(ageMax_yr, TimeUnit::yr);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient age of " << age_yr << " years is too old. We do not model geriatrics. Maximum age allowed is " << ageMax_yr << " years.");
+      err = true;
+    }
   }
 
   //PAIN SUSCEPTIBILITY -----------------------------------------------------------------------------------
@@ -359,8 +367,12 @@ bool BioGears::SetupPatient()
   weight_kg = m_Patient->GetWeight(MassUnit::kg);
   BMI_kg_per_m2 = weight_kg / std::pow(m_Patient->GetHeight().GetValue(LengthUnit::m), 2);
   if (BMI_kg_per_m2 > BMIObese_kg_per_m2) {
-    m_Logger->Error(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << "  kg/m^2 is too high. Obese patients must be modeled by adding/using a condition. Maximum BMI allowed is " << BMIObese_kg_per_m2 << " kg/m^2.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetWeight().SetValue(BMIObese_kg_per_m2 * std::pow(m_Patient->GetHeight().GetValue(LengthUnit::m), 2), MassUnit::kg);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << "  kg/m^2 is too high. Obese patients must be modeled by adding/using a condition. Maximum BMI allowed is " << BMIObese_kg_per_m2 << " kg/m^2.");
+      err = true;
+    }
   }
   if (BMI_kg_per_m2 > BMIOverweight_kg_per_m2) {
     m_Logger->Warning(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << " kg/m^2 is overweight. No guarantees of model validity.");
@@ -369,8 +381,12 @@ bool BioGears::SetupPatient()
     m_Logger->Warning(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << " kg/m^2 is underweight. No guarantees of model validity.");
   }
   if (BMI_kg_per_m2 < BMISeverelyUnderweight_kg_per_m2) {
-    m_Logger->Error(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << " kg/m^2 is too low. Severly underweight patients must be modeled by adding/using a condition. Maximum BMI allowed is " << BMISeverelyUnderweight_kg_per_m2 << " kg/m^2.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetWeight().SetValue(BMISeverelyUnderweight_kg_per_m2 * std::pow(m_Patient->GetHeight().GetValue(LengthUnit::m), 2), MassUnit::kg);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient Body Mass Index (BMI) of " << BMI_kg_per_m2 << " kg/m^2 is too low. Severly underweight patients must be modeled by adding/using a condition. Maximum BMI allowed is " << BMISeverelyUnderweight_kg_per_m2 << " kg/m^2.");
+      err = true;
+    }
   }
 
   //BODY FAT FRACTION ---------------------------------------------------------------
@@ -401,11 +417,19 @@ bool BioGears::SetupPatient()
   }
   fatFraction = m_Patient->GetBodyFatFraction().GetValue();
   if (fatFraction > fatFractionMax) {
-    m_Logger->Error(std::stringstream() << "Patient body fat fraction of " << fatFraction << " is too high. Obese patients must be modeled by adding/using a condition. Maximum body fat fraction allowed is " << fatFractionMax << ".");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetBodyFatFraction().SetValue(fatFractionMax);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient body fat fraction of " << fatFraction << " is too high. Obese patients must be modeled by adding/using a condition. Maximum body fat fraction allowed is " << fatFractionMax << ".");
+      err = true;
+    }
   } else if (fatFraction < fatFractionMin) {
-    m_Logger->Error(std::stringstream() << "Patient body fat fraction  " << fatFraction << " is too low. Patients must have essential fat. Minimum body fat fraction allowed is " << fatFractionMin << ".");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetBodyFatFraction().SetValue(fatFractionMin);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient body fat fraction  " << fatFraction << " is too low. Patients must have essential fat. Minimum body fat fraction allowed is " << fatFractionMin << ".");
+      err = true;
+    }
   }
 
   //Lean Body Mass ---------------------------------------------------------------
@@ -513,11 +537,19 @@ bool BioGears::SetupPatient()
   }
   systolic_mmHg = m_Patient->GetSystolicArterialPressureBaseline(PressureUnit::mmHg);
   if (systolic_mmHg < systolicMin_mmHg) {
-    m_Logger->Error(std::stringstream() << "Patient systolic pressure baseline of " << systolic_mmHg << " mmHg is too low. Hypotension must be modeled by adding/using a condition. Minimum systolic pressure baseline allowed is " << systolicMin_mmHg << " mmHg.");
-    err = true;
+      if (m_Patient->AutoReset()) {
+        m_Patient->GetSystolicArterialPressureBaseline().SetValue(systolicMin_mmHg, PressureUnit::mmHg);
+      } else {
+        m_Logger->Error(std::stringstream() << "Patient systolic pressure baseline of " << systolic_mmHg << " mmHg is too low. Hypotension must be modeled by adding/using a condition. Minimum systolic pressure baseline allowed is " << systolicMin_mmHg << " mmHg.");
+        err = true;
+      }
   } else if (systolic_mmHg > systolicMax_mmHg) {
-    m_Logger->Error(std::stringstream() << "Patient systolic pressure baseline of " << systolic_mmHg << " mmHg is too high. Hypertension must be modeled by adding/using a condition. Maximum systolic pressure baseline allowed is " << systolicMax_mmHg << " mmHg.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+        m_Patient->GetSystolicArterialPressureBaseline().SetValue(systolicMax_mmHg, PressureUnit::mmHg);
+      } else {
+        m_Logger->Error(std::stringstream() << "Patient systolic pressure baseline of " << systolic_mmHg << " mmHg is too high. Hypertension must be modeled by adding/using a condition. Maximum systolic pressure baseline allowed is " << systolicMax_mmHg << " mmHg.");
+        err = true;
+      }
   }
 
   if (!m_Patient->HasDiastolicArterialPressureBaseline()) {
@@ -527,16 +559,28 @@ bool BioGears::SetupPatient()
   }
   diastolic_mmHg = m_Patient->GetDiastolicArterialPressureBaseline(PressureUnit::mmHg);
   if (diastolic_mmHg < diastolicMin_mmHg) {
-    m_Logger->Error(std::stringstream() << "Patient diastolic pressure baseline of " << diastolic_mmHg << " mmHg is too low. Hypotension must be modeled by adding/using a condition. Minimum diastolic pressure baseline allowed is " << diastolicMin_mmHg << " mmHg.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetDiastolicArterialPressureBaseline().SetValue(diastolicMin_mmHg, PressureUnit::mmHg);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient diastolic pressure baseline of " << diastolic_mmHg << " mmHg is too low. Hypotension must be modeled by adding/using a condition. Minimum diastolic pressure baseline allowed is " << diastolicMin_mmHg << " mmHg.");
+      err = true;
+    }
   } else if (diastolic_mmHg > diastolicMax_mmHg) {
-    m_Logger->Error(std::stringstream() << "Patient diastolic pressure baseline of " << diastolic_mmHg << " mmHg is too high. Hypertension must be modeled by adding/using a condition. Maximum diastolic pressure baseline allowed is " << diastolicMax_mmHg << " mmHg.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetDiastolicArterialPressureBaseline().SetValue(diastolicMax_mmHg, PressureUnit::mmHg);
+    } else {
+      m_Logger->Error(std::stringstream() << "Patient diastolic pressure baseline of " << diastolic_mmHg << " mmHg is too high. Hypertension must be modeled by adding/using a condition. Maximum diastolic pressure baseline allowed is " << diastolicMax_mmHg << " mmHg.");
+      err = true;
+    }
   }
 
   if (diastolic_mmHg > 0.75 * systolic_mmHg) {
-    m_Logger->Error(std::stringstream() << "Patient baseline pulse pressure (systolic vs. diastolic pressure fraction) of " << diastolic_mmHg / systolic_mmHg << " is abnormally narrow. Minimum fraction allowed is " << narrowestPulseFactor << " .");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetDiastolicArterialPressureBaseline().SetValue(0.75 * systolic_mmHg, PressureUnit::mmHg);
+    } else {  
+      m_Logger->Error(std::stringstream() << "Patient baseline pulse pressure (systolic vs. diastolic pressure fraction) of " << diastolic_mmHg / systolic_mmHg << " is abnormally narrow. Minimum fraction allowed is " << narrowestPulseFactor << " .");
+      err = true;
+    }
   }
 
   if (m_Patient->HasMeanArterialPressureBaseline()) {
@@ -598,11 +642,19 @@ bool BioGears::SetupPatient()
   respirationRate_bpm = m_Patient->GetRespirationRateBaseline(FrequencyUnit::Per_min);
 
   if (respirationRate_bpm > respirationRateMax_bpm) {
-    m_Logger->Error(std::stringstream() << "Patient respiration rate baseline of " << respirationRate_bpm << " bpm is too high. Non-healthy values must be modeled by adding/using a condition. Maximum respiration rate baseline allowed is " << respirationRateMax_bpm << " bpm.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetRespirationRateBaseline().SetValue(respirationRateMax_bpm, FrequencyUnit::Per_min);
+    } else {     
+      m_Logger->Error(std::stringstream() << "Patient respiration rate baseline of " << respirationRate_bpm << " bpm is too high. Non-healthy values must be modeled by adding/using a condition. Maximum respiration rate baseline allowed is " << respirationRateMax_bpm << " bpm.");
+      err = true;
+    }
   } else if (respirationRate_bpm < respirationRateMin_bpm) {
-    m_Logger->Error(std::stringstream() << "Patient respiration rate baseline of " << respirationRate_bpm << " bpm is too low. Non-healthy values must be modeled by adding/using a condition. Minimum respiration rate baseline allowed is " << respirationRateMin_bpm << " bpm.");
-    err = true;
+    if (m_Patient->AutoReset()) {
+      m_Patient->GetRespirationRateBaseline().SetValue(respirationRateMin_bpm, FrequencyUnit::Per_min);
+    } else {  
+      m_Logger->Error(std::stringstream() << "Patient respiration rate baseline of " << respirationRate_bpm << " bpm is too low. Non-healthy values must be modeled by adding/using a condition. Minimum respiration rate baseline allowed is " << respirationRateMin_bpm << " bpm.");
+      err = true;
+    }
   }
 
   //Right Lung Ratio ---------------------------------------------------------------

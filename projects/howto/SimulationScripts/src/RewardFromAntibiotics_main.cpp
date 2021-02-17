@@ -5,5 +5,6 @@
 
 int main( int argc, char* argv[] )
 {
-  return RewardFromAntibiotics(argv[1], *argv[2], *argv[3]);
+  RewardFromAntibiotics("", 500.0, 10.0, "none");
+  return 0;
 }

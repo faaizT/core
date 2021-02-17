@@ -48,6 +48,8 @@ class VolumePerTimeUnit;
 class BIOGEARS_API SEPatient : public Loggable {
 public:
   SEPatient(Logger* logger);
+  SEPatient(Logger* logger, bool auto_reset);
+
   virtual ~SEPatient();
 
   virtual void Clear();
@@ -107,6 +109,9 @@ public:
   virtual void SetSex(CDM::enumSex::value sex);
   virtual bool HasSex() const;
   virtual void InvalidateSex();
+
+  virtual bool AutoReset() const;
+  virtual void SetAutoReset(bool auto_reset);
 
   virtual bool HasAge() const;
   virtual SEScalarTime& GetAge();
@@ -259,6 +264,7 @@ protected:
   std::map<CDM::enumPatientEvent::value, bool> m_EventState;
   std::map<CDM::enumPatientEvent::value, double> m_EventDuration_s;
 
+  bool m_AutoReset;
   std::string m_Name;
   std::string m_Annotation;
   CDM::enumSex::value m_Gender;

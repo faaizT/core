@@ -23,4 +23,4 @@ class SESubstanceInfusion;
 class SESubstanceCompoundInfusion;
 }
 
-double RewardFromAntibiotics(const std::string& patient_state, double volume, double rate);
+double RewardFromAntibiotics(const std::string& patient_state, double volume, double rate, const std::string& severity);

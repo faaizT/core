@@ -21,6 +21,7 @@ namespace biogears {
 SEPatient::SEPatient(Logger* logger)
   : Loggable(logger)
 {
+  m_AutoReset = false;
   m_EventHandler = nullptr;
 
   m_Name = "";
@@ -72,6 +73,11 @@ SEPatient::SEPatient(Logger* logger)
   }
 
 }
+
+SEPatient::SEPatient(Logger* logger, bool auto_reset) : SEPatient(logger)
+{
+  m_AutoReset = auto_reset;
+}
 //-----------------------------------------------------------------------------
 SEPatient::~SEPatient()
 {
@@ -101,6 +107,7 @@ bool SEPatient::Load(const std::string& patientFile)
 //-----------------------------------------------------------------------------
 void SEPatient::Clear()
 {
+  m_AutoReset = false;
   m_EventHandler = nullptr;
 
   for (CDM::enumPatientEvent::value key = static_cast<CDM::enumPatientEvent::value>(0); key < CDM::enumPatientEvent::TotalPatientEvents; key = static_cast<CDM::enumPatientEvent::value>(key + 1)) {
@@ -929,6 +936,16 @@ void SEPatient::InvalidateGender()
 [[deprecated("Use InvalidateGender instead")]] void SEPatient::InvalidateSex()
 {
   m_Gender = (CDM::enumSex::value)-1;
+}
+//-----------------------------------------------------------------------------
+bool SEPatient::AutoReset() const
+{
+  return m_AutoReset;
+}
+//-----------------------------------------------------------------------------
+void SEPatient::SetAutoReset(bool auto_reset)
+{
+  m_AutoReset = auto_reset;
 }
 //-----------------------------------------------------------------------------
 bool SEPatient::HasAge() const

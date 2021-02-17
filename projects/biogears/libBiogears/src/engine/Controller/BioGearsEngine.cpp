@@ -570,6 +570,7 @@ bool BioGearsEngine::InitializeEngine(const std::string& patientFile, const std:
 bool BioGearsEngine::InitializeEngine(const SEPatient& patient, const std::vector<const SECondition*>* conditions, const PhysiologyEngineConfiguration* config)
 {
   CDM_COPY((&patient), m_Patient);
+  m_Patient->SetAutoReset(patient.AutoReset());
   // We need logic here that makes sure we have what we need
   // and notify we are ignoring anything provided we won't use
   return InitializeEngine(conditions, config);
