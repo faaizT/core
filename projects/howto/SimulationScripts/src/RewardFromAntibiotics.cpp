@@ -41,63 +41,12 @@ specific language governing permissions and limitations under the License.
 #include <biogears/cdm/substance/SESubstanceManager.h>
 #include <map>
 #include <mutex>
+#include <thread>
+
 
 
 using namespace biogears;
-void administer_vasopressors(std::unique_ptr<PhysiologyEngine> &bg, double rate, double weight, std::mutex* mutex) {
-	SESubstance* norepinephrine = bg->GetSubstanceManager().GetSubstance("Norepinephrine");
-	SESubstanceInfusion m_pressor {*norepinephrine};
-	m_pressor.GetRate().SetValue(rate*weight, VolumePerTimeUnit::mL_Per_min);
-  	m_pressor.GetConcentration().SetValue(1.0, MassPerVolumeUnit::ug_Per_mL);
-	mutex->lock();
-	bg->ProcessAction(m_pressor);
-	mutex->unlock();
-}
 
-void simulate_mimic(const std::string& mimicdir, double icustayid, const std::string& exportdir)
-{
-	double time_step = 0;
-	std::mutex mutex;
-	std::unique_ptr<PhysiologyEngine> bg = CreateBioGearsEngine("SimulateMIMIC.log");
-	SEPatient pt(bg->GetLogger(), true);
-	CsvUtils csvUtils(mimicdir, icustayid);
-	
-	PatientUtils::create_patient(&pt, &csvUtils, icustayid);
-	
-	if (!bg->InitializeEngine(pt)) {
-   		bg->GetLogger()->Error("Could not load state, check the error");
-    	return;
-	}
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("HeartRate", FrequencyUnit::Per_min);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("BloodVolume", VolumeUnit::mL);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("CardiacOutput", VolumePerTimeUnit::mL_Per_min);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("MeanArterialPressure", PressureUnit::mmHg);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("SystolicArterialPressure", PressureUnit::mmHg);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("DiastolicArterialPressure", PressureUnit::mmHg);
-	bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("StomachContents-Water",VolumeUnit::mL);
-		
-	bg->GetEngineTrack()->GetDataRequestManager().SetResultsFilename("SimulateMIMIC_" + std::to_string(icustayid) + ".csv");
-	std::map<std::string, std::vector<std::string>> data = csvUtils.get_data();
-	double preadm_input = std::stod(data["input_total"].at(0)) - std::stod(data["input_1hourly"].at(0));
-	administer_vasopressors(bg, 0.45, 45.0, &mutex);
-	// administer_iv
-	double prev_time_step = std::stod(data["charttime"].at(0));
-	int rowNum = csvUtils.get_rows();
-	for(int i = 0; i < rowNum; i++) {
-		double time_step_jump = std::stod(data["charttime"].at(i)) - prev_time_step;
-		int t = 0;
-		while (t < ((int)time_step_jump/3600)) {
-			// consume nutrients
-			bg->AdvanceModelTime(3600, TimeUnit::s);
-			time_step += 3600;
-			t += 1;
-		}
-		bg->AdvanceModelTime(time_step_jump - t*3600, TimeUnit::s);
-		// administer vp
-		// administer iv
-		prev_time_step = std::stod(data["charttime"].at(i));
-	}
-}
 
 double RewardFromAntibiotics(const std::string& patient_state, double volume, double rate, const std::string& severity)
 {
