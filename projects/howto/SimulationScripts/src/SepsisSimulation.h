@@ -42,6 +42,7 @@ specific language governing permissions and limitations under the License.
 #include <biogears/cdm/substance/SESubstance.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceManager.h>
+#include <biogears/cdm/patient/actions/SEOverride.h>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -119,6 +120,40 @@ public:
 		bg->AdvanceModelTime(time, unit);
         bg->GetLogger()->Info("Advanced time by " + std::to_string(time) + unit.GetString());
 	}
+
+    void override_readings(int index)
+    {
+        std::lock_guard<std::mutex> l(mutex);
+        SEOverride override;
+        override.SetOverrideState(CDM::enumOnOff::On);
+        override.SetOverrideConformance(CDM::enumOnOff::On);
+        double arterial_ph = std::stod(mimic_data["Arterial_pH"].at(index));
+        override.GetArterialPHOverride().SetValue(arterial_ph);
+        double wbc_count = std::stod(mimic_data["WBC_count"].at(index))*1000;
+        override.GetWBCCountOverride().SetValue(wbc_count, AmountPerVolumeUnit::ct_Per_uL);
+        double total_bili = std::stod(mimic_data["Total_bili"].at(index));
+        override.GetTotalBilirubinOverride().SetValue(total_bili, MassPerVolumeUnit::mg_Per_dL);
+        double glucose_conc = std::stod(mimic_data["Glucose"].at(index));
+        override.GetGlucoseConcentrationOverride().SetValue(glucose_conc, MassPerVolumeUnit::mg_Per_dL);
+        double lactate_conc = std::stod(mimic_data["Arterial_lactate"].at(index));
+        override.GetLactateConcentrationOverride().SetValue(lactate_conc * 89.07, MassPerVolumeUnit::ug_Per_mL);
+        double sodium_conc = std::stod(mimic_data["Sodium"].at(index));
+        override.GetSodiumConcentrationOverride().SetValue(sodium_conc * 22.9898, MassPerVolumeUnit::ug_Per_mL);
+        double potassium_conc = std::stod(mimic_data["Potassium"].at(index));
+        override.GetPotassiumConcentrationOverride().SetValue(potassium_conc * 39.10, MassPerVolumeUnit::ug_Per_mL);
+        double calcium_conc = std::stod(mimic_data["Ionised_Ca"].at(index));
+        override.GetCalciumConcentrationOverride().SetValue(calcium_conc * 40.08, MassPerVolumeUnit::ug_Per_mL);
+        double core_temp = std::stod(mimic_data["Temp_C"].at(index));
+        override.GetCoreTemperatureOverride().SetValue(core_temp, TemperatureUnit::C);
+        double oxygen_saturation = std::stod(mimic_data["paO2"].at(index));
+        override.GetO2SaturationOverride().SetValue(oxygen_saturation/100);
+        double co2_saturation = std::stod(mimic_data["paCO2"].at(index));
+        override.GetCO2SaturationOverride().SetValue(co2_saturation/1000);
+        if (override.IsValid()) {
+            bg->GetLogger()->Info("Overriding Readings to Copy MIMIC.........................");
+            bg->ProcessAction(override);
+        }
+    }
 
     void sepsis_infection(double sofa)
     {
