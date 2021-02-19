@@ -26,8 +26,10 @@ void simulate_mimic(const std::string& mimicdir, double icustayid, const std::st
             sepsisSimulation.advance_time(3600, TimeUnit::s);
             time_step += 3600;
             t += 1;
-        }
+        }        
         sepsisSimulation.advance_time(time_step_jump - t*3600, TimeUnit::s);
+        double o2_frac = std::stod(data["FiO2_1"].at(i));
+        sepsisSimulation.action_o2_mask(o2_frac);
         double iv_input = std::stod(data["input_1hourly"].at(i));
         sepsisSimulation.administer_iv(iv_input);
         double vp_rate = std::stod(data["median_dose_vaso"].at(i));

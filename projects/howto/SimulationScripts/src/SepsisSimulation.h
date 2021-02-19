@@ -25,6 +25,8 @@ specific language governing permissions and limitations under the License.
 #include <biogears/cdm/patient/actions/SEConsumeNutrients.h>
 #include <biogears/cdm/system/physiology/SEGastrointestinalSystem.h>
 #include <biogears/cdm/system/physiology/SECardiovascularSystem.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachine.h>
+#include <biogears/cdm/system/equipment/Anesthesia/actions/SEAnesthesiaMachineConfiguration.h>
 #include <biogears/cdm/system/physiology/SEEnergySystem.h>
 #include <biogears/cdm/patient/SENutrition.h>
 #include <biogears/cdm/patient/SEPatient.h>
@@ -185,6 +187,20 @@ public:
             nutrients.GetNutrition().GetWater().SetValue(150, VolumeUnit::mL);
         }
         bg->ProcessAction(nutrients);
+    }
+
+    void action_o2_mask(double o2_fraction)
+    {
+        std::lock_guard<std::mutex> l(mutex);
+        auto AMConfig = biogears::SEAnesthesiaMachineConfiguration(bg->GetSubstanceManager());
+        auto& config = AMConfig.GetConfiguration();
+        config.GetOxygenFraction().SetValue(o2_fraction);
+        if (AMConfig.IsValid()) {
+            bg->GetLogger()->Info("Using oxygen mask.....................");
+            bg->ProcessAction(AMConfig);
+        } else {
+            bg->GetLogger()->Info("Skipping oxygen mask. Invalid configuration.");
+        }
     }
 
     std::map<std::string, std::vector<std::string>> get_mimic_data() const
