@@ -23,9 +23,6 @@ void simulate_mimic(const std::string& mimicdir, double icustayid, const std::st
     double prev_time_step = std::stod(data["charttime"].at(0));
     int rowNum = data["charttime"].size();
     for(int i = 0; i < rowNum; i++) {
-        if (override_readings) {
-          sepsisSimulation.override_readings(i);
-        }
         double time_step_jump = std::stod(data["charttime"].at(i)) - prev_time_step;
         int t = 0;
         while (t < ((int)time_step_jump/3600)) {
@@ -35,6 +32,9 @@ void simulate_mimic(const std::string& mimicdir, double icustayid, const std::st
             t += 1;
         }        
         sepsisSimulation.advance_time(time_step_jump - t*3600, TimeUnit::s);
+        if (override_readings) {
+          sepsisSimulation.override_readings(i);
+        }
         double o2_frac = std::stod(data["FiO2_1"].at(i));
         sepsisSimulation.action_o2_mask(o2_frac);
         double iv_input = std::stod(data["input_1hourly"].at(i));
