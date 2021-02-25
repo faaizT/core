@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <set>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -157,5 +158,45 @@ public:
             }
         }
         return column;
+    }
+
+    static std::set<double> get_icustayids(const std::string& mimic_file_path)
+    {
+        std::set<double> icustayids;
+        std::ifstream myFile(mimic_file_path);
+
+        // Make sure the file is open
+        if(!myFile.is_open()) throw std::runtime_error("Could not open file");
+
+        // Helper vars
+        std::string line, colname;
+        std::string val;
+        int icustayid_idx;
+
+        // Read the column names
+        if(myFile.good())
+        {
+            // Extract the first line in the file
+            std::getline(myFile, line);
+
+            std::vector<std::string> cols = biogears::string_split(line, ",");
+            if (std::find(cols.begin(), cols.end(), "icustay_id") == cols.end())
+            {
+                throw std::runtime_error("Column icustay_id not found");
+            }
+            icustayid_idx = std::find(cols.begin(), cols.end(), "icustay_id") - cols.begin();
+        }
+        else
+        {
+            throw std::runtime_error("File not good");
+        }
+        // Read data, line by line
+        while(std::getline(myFile, line))
+        {        
+            std::vector<std::string> vals = biogears::string_split(line, ",");
+            icustayids.insert(std::stod(vals.at(icustayid_idx)));
+        }
+        myFile.close();
+        return icustayids;
     }
 };
