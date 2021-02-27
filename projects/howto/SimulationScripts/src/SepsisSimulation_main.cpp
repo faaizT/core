@@ -78,13 +78,41 @@ void simulate_mimic_until_first_action(const std::string& mimicdir, double icust
     }
     sepsisSimulation.sepsis_infection(std::stod(data["SOFA"].at(0)));
     double prev_time_step = std::stod(data["charttime"].at(0));
-    for(int i = 0; i < last_index; i++) {
+    for(int i = 0; i < std::min(last_index+1, (int) data["charttime"].size()); i++) {
         double time_step_jump = std::stod(data["charttime"].at(i)) - prev_time_step;
         int t = 0;
         while (t < ((int)time_step_jump/3600)) {
             sepsisSimulation.consume_nutrients(time_step);
-            sepsisSimulation.advance_time(3600, TimeUnit::s);
-            time_step += 3600;
+            sepsisSimulation.advance_time(1800, TimeUnit::s);
+            time_step += 1800;
+            if (((float) rand()/RAND_MAX) < 1./3.) {
+              sepsisSimulation.urinate();
+            }
+            if (((int) time_step % 7*1800) == 0 && ((float) rand()/RAND_MAX) < 0.4) {
+              sepsisSimulation.generic_exercise(60*15, std::min({(double) rand()/RAND_MAX, 0.4}));
+              sepsisSimulation.consume_nutrients(time_step);
+              sepsisSimulation.advance_time(60*15, TimeUnit::s);
+            } else if (((float) rand()/RAND_MAX) < 0.4) {
+              sepsisSimulation.acute_stress();
+              sepsisSimulation.advance_time(60*30, TimeUnit::s);
+            } else if (((float) rand()/RAND_MAX) < 0.3) {
+              sepsisSimulation.pain_stimulus();
+              sepsisSimulation.advance_time(60*5, TimeUnit::s);
+              sepsisSimulation.administer_morphine();
+              sepsisSimulation.advance_time(60*25, TimeUnit::s);
+            } else if (((float) rand()/RAND_MAX) < 0.2) {
+              sepsisSimulation.asthma_attack(60);
+              sepsisSimulation.advance_time(60*29, TimeUnit::s);
+            } else if (((float) rand()/RAND_MAX) < 0.2) {
+              sepsisSimulation.airway_obstruction(60);
+              sepsisSimulation.advance_time(60*29, TimeUnit::s);
+            } else if (((float) rand()/RAND_MAX) < 0.1) {
+              sepsisSimulation.apnea(0.3);
+              sepsisSimulation.advance_time(60*30, TimeUnit::s);
+            } else {
+              sepsisSimulation.advance_time(60*30, TimeUnit::s);
+            }
+            time_step += 1800;
             t += 1;
         }        
         sepsisSimulation.advance_time(time_step_jump - t*3600, TimeUnit::s);
@@ -94,7 +122,8 @@ void simulate_mimic_until_first_action(const std::string& mimicdir, double icust
         double o2_frac = std::stod(data["FiO2_1"].at(i));
         sepsisSimulation.action_o2_mask(o2_frac);
         prev_time_step = std::stod(data["charttime"].at(i));
-    }  
+    }
+    sepsisSimulation.advance_time(600, TimeUnit::s);  
   }
 }
 
