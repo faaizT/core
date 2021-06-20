@@ -20,7 +20,7 @@ void print_help()
   exit(0);
 }
 
-void simulate_mimic(const std::string& mimicdir, double icustayid, const std::string& exportdir, bool override_readings=true)
+void simulate_mimic(const std::string& mimicdir, double icustayid, const std::string& exportdir, bool override_readings=false)
 {
     SepsisSimulation sepsisSimulation(mimicdir, icustayid, exportdir);
     double time_step = 0;
@@ -29,13 +29,13 @@ void simulate_mimic(const std::string& mimicdir, double icustayid, const std::st
       sepsisSimulation.override_readings(0);
     }
     sepsisSimulation.sepsis_infection(std::stod(data["SOFA"].at(0)));
-    double preadm_input = std::stod(data["input_total"].at(0)) - std::stod(data["input_1hourly"].at(0));
-    sepsisSimulation.administer_iv(preadm_input, true);
-    for (int i = 0; i < std::ceil(preadm_input/750); i++) {
-        sepsisSimulation.consume_nutrients(time_step);
-        sepsisSimulation.advance_time(3600, TimeUnit::s);
-        time_step += 3600;
-    }
+    // double preadm_input = std::stod(data["input_total"].at(0)) - std::stod(data["input_1hourly"].at(0));
+    // sepsisSimulation.administer_iv(preadm_input, true);
+    // for (int i = 0; i < std::ceil(preadm_input/750); i++) {
+    //     sepsisSimulation.consume_nutrients(time_step);
+    //     sepsisSimulation.advance_time(3600, TimeUnit::s);
+    //     time_step += 3600;
+    // }
     double prev_time_step = std::stod(data["charttime"].at(0));
     int rowNum = data["charttime"].size();
     for(int i = 0; i < rowNum; i++) {
@@ -59,6 +59,7 @@ void simulate_mimic(const std::string& mimicdir, double icustayid, const std::st
         sepsisSimulation.administer_vasopressors(vp_rate);
         prev_time_step = std::stod(data["charttime"].at(i));
     }
+    sepsisSimulation.advance_time(10, TimeUnit::s);
 }
 
 void simulate_mimic_until_first_action(const std::string& mimicdir, double icustayid, const std::string& exportdir, bool override_readings=true)
@@ -152,33 +153,38 @@ void run_simulation_threads(const std::string& mimicdir, std::set<double> icusta
 
 int main( int argc, char* argv[] )
 {
+  // std::set<double> icustayids;
+  // if (argc < 5) {
+  //   print_help();
+  // }
+  // if ((std::string) argv[2] == "all") {
+  //   icustayids = CsvUtils::get_icustayids((std::string) argv[1] + "/MIMICtable-1hourly_entire-stay.csv");
+  // } else {
+  //   icustayids = CsvUtils::get_icustayids((std::string) argv[1]);
+  //   int icustayid = *next(icustayids.begin(), std::stoi(argv[2]));
+  // }
+  // std::stringstream ss(argv[4]);
+  // bool until_first_action;
+  // if(!(ss >> std::boolalpha >> until_first_action)) {
+  //   print_help();
+  // }
+  // if (argc >= 6) {
+  //   std::stringstream ss(argv[5]);
+  //   bool override;
+  //   if(!(ss >> std::boolalpha >> override)) {
+  //     print_help();
+  //   }
+  //   if (argc >= 7) {
+  //     run_simulation_threads(argv[1], icustayids, argv[3], until_first_action, override, std::stoi(argv[6]));
+  //   } else {
+  //     run_simulation_threads(argv[1], icustayids, argv[3], until_first_action, override);
+  //   }
+  // } else {
+  //   run_simulation_threads(argv[1], icustayids, argv[3], until_first_action);
+  // }
   std::set<double> icustayids;
-  if (argc < 5) {
-    print_help();
-  }
-  if ((std::string) argv[2] == "all") {
-    icustayids = CsvUtils::get_icustayids((std::string) argv[1] + "/MIMICtable-1hourly_entire-stay.csv");
-  } else {
-    icustayids.insert(std::stod(argv[2]));
-  }
-  std::stringstream ss(argv[4]);
-  bool until_first_action;
-  if(!(ss >> std::boolalpha >> until_first_action)) {
-    print_help();
-  }
-  if (argc >= 6) {
-    std::stringstream ss(argv[5]);
-    bool override;
-    if(!(ss >> std::boolalpha >> override)) {
-      print_help();
-    }
-    if (argc >= 7) {
-      run_simulation_threads(argv[1], icustayids, argv[3], until_first_action, override, std::stoi(argv[6]));
-    } else {
-      run_simulation_threads(argv[1], icustayids, argv[3], until_first_action, override);
-    }
-  } else {
-    run_simulation_threads(argv[1], icustayids, argv[3], until_first_action);
-  }
+  icustayids = CsvUtils::get_icustayids((std::string) argv[1]);
+  int icustayid = *std::next(icustayids.begin(), std::stoi(argv[2]));
+  simulate_mimic(argv[1], icustayid, argv[3], false);
   return 0;
 }

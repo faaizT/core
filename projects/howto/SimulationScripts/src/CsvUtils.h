@@ -89,9 +89,9 @@ private:
 
 public:
 
-    CsvUtils(std::string mimic_dir, double icustayid)
+    CsvUtils(std::string mimic_file, double icustayid)
     {
-        read_csv(mimic_dir + "/MIMICtable-1hourly_entire-stay.csv", icustayid);
+        read_csv(mimic_file, icustayid);
     }
 
     std::map<std::string, std::vector<std::string>> get_data() const

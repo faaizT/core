@@ -85,7 +85,7 @@ public:
 		std::string time_now = currentDateTime();
 		CsvUtils csvUtils(mimicdir, icustayid);
 		mimic_data = csvUtils.get_data();
-		bg = CreateBioGearsEngine("SimulateMIMIC_" + std::to_string((int) icustayid) + "_" + time_now + ".log");
+		bg = CreateBioGearsEngine("/tmp/SimulateMIMIC_" + std::to_string((int) icustayid) + "_" + time_now + ".log");
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("HeartRate", FrequencyUnit::Per_min);
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("MeanArterialPressure", PressureUnit::mmHg);
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("SystolicArterialPressure", PressureUnit::mmHg);
@@ -103,20 +103,20 @@ public:
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("CarbonDioxideSaturation");
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("CoreTemperature", TemperatureUnit::C);
 		bg->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("SkinTemperature", TemperatureUnit::C);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Bicarbonate"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Creatinine"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Lactate"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Piperacillin"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Tazobactam"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Glucose"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Sodium"), "BloodConcentration", AmountPerVolumeUnit::mmol_Per_L);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Potassium"), "BloodConcentration", AmountPerVolumeUnit::mmol_Per_L);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Chloride"), "BloodConcentration", AmountPerVolumeUnit::mmol_Per_L);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Calcium"), "BloodConcentration", AmountPerVolumeUnit::mmol_Per_L);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Magnesium"), "BloodConcentration", MassPerVolumeUnit::mg_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Albumin"), "BloodConcentration", MassPerVolumeUnit::g_Per_dL);
-		bg->GetEngineTrack()->GetDataRequestManager().SetResultsFilename(exportdir + "/SimulateMIMIC_" + std::to_string((int) icustayid) + "_" + time_now + ".csv");
-		bg->GetEngineTrack()->GetDataRequestManager().SetSamplesPerSecond(1. / (5. * 60.));
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Bicarbonate"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Creatinine"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Lactate"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Piperacillin"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Tazobactam"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Glucose"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Sodium"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Potassium"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Chloride"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Calcium"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Magnesium"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().CreateSubstanceDataRequest().Set(*bg->GetSubstanceManager().GetSubstance("Albumin"), "BloodConcentration", MassPerVolumeUnit::mg_Per_L);
+		bg->GetEngineTrack()->GetDataRequestManager().SetResultsFilename(exportdir + "/SimulateMIMIC_" + std::to_string((int) icustayid) + "_" + ".csv");
+		bg->GetEngineTrack()->GetDataRequestManager().SetSamplesPerSecond(1. / (10. * 60.));
 		SEPatient pt(bg->GetLogger(), true);
 		PatientUtils::create_patient(&pt, &csvUtils, icustayid);
 		
@@ -124,7 +124,7 @@ public:
 			bg->GetLogger()->Error("Could not load state, check the error");
 			return;
 		}
-		bg->SaveState("./states/" + std::to_string((int) icustayid) + "@0s.xml");
+		// bg->SaveState("./states/" + std::to_string((int) icustayid) + "@0s.xml");
 	}
 
 	void advance_time(int time, TimeUnit unit)
